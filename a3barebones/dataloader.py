@@ -23,28 +23,44 @@ def splitdataset(numruns,dataset, trainsize, testsize, testdataset=None, feature
     #np.random.seed(123)
     #randindices = np.random.choice(dataset.shape[0],trainsize+testsize, replace=False)
     randindices = []
-    trainsizeRange = int(trainsize/2)
-    testsizeRange = int(testsize/2)
-    numruns += 1
-    print numruns
-    print (numruns-1)*5000,numruns*5000
-    print (numruns+9)*5000,(numruns+10)*5000
-    # train data
-    for i in range(((numruns-1)*trainsizeRange),(numruns*trainsizeRange)):
-        #index = random.randint(((numruns-1)*10000),(numruns*10000))
-        randindices.append(i)
-    for i in range(((numruns+9)*trainsizeRange),((numruns+10)*trainsizeRange)):
-       # index = random.randint(((numruns+4)*10000),((numruns+5)*10000))
-        randindices.append(i)
+   #  trainsizeRange = int(trainsize/2)
+   #  testsizeRange = int(testsize/2)
+   #  numruns += 1
+   #  print numruns
+   #  print (numruns-1)*5000,numruns*5000
+   #  print (numruns+9)*5000,(numruns+10)*5000
+   #  # train data
+   #  for i in range(((numruns-1)*trainsizeRange),(numruns*trainsizeRange)):
+   #      #index = random.randint(((numruns-1)*10000),(numruns*10000))
+   #      randindices.append(i)
+   #  for i in range(((numruns+9)*trainsizeRange),((numruns+10)*trainsizeRange)):
+   #     # index = random.randint(((numruns+4)*10000),((numruns+5)*10000))
+   #      randindices.append(i)
+   # # print randindices
+
+   #  # test data
+   #  for i in range(testsizeRange):
+   #      index = random.randint(40000,50000)
+   #      randindices.append(index)
+   #  for i in range(testsizeRange):
+   #      index = random.randint(90000,99999)
+   #      randindices.append(index)
+    split_list = []
+    for i in range(10):
+        data_list = []
+        #print i*10000,(i+1)*10000
+        for index in range(i*1000,(i+1)*1000):
+            data_list.append(index)
+        split_list.append(data_list)
+
+    for i in range(10):
+        if i != numruns:
+            for index in range(len(split_list[0])):
+                randindices.append(split_list[i][index])
+    for i in range(len(split_list[numruns])):
+        randindices.append(split_list[numruns][i])
    # print randindices
 
-    # test data
-    for i in range(testsizeRange):
-        index = random.randint(40000,50000)
-        randindices.append(index)
-    for i in range(testsizeRange):
-        index = random.randint(90000,99999)
-        randindices.append(index)
 
     featureend = dataset.shape[1]-1
     outputlocation = featureend    

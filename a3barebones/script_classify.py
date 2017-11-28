@@ -72,7 +72,10 @@ def plotgbr(temp,w,is_NN,learnername):
     ax.set_title(learnername)
     plt.show()
 
-def ttestHo(Neural_Network,Linear,Logistic):
+def ttestHo(errorslist):
+    Neural_Network = np.array(errorslist[0])
+    Linear = np.array(errorslist[1])
+    Logistic = np.array(errorslist[2])
     # test NN is better than linear?
     alpha = 0.05
     t,p = stats.ttest_ind(Neural_Network,Linear,equal_var=False)
@@ -102,19 +105,20 @@ if __name__ == '__main__':
     testsize =  10000
     numruns = 1
 
-    classalgs = {#'Random': algs.Classifier(),
+    classalgs = {
                  'Linear Regression': algs.LinearRegressionClass(),
                  'Logistic Regression': algs.LogitReg(),
-                 #'Neural Network': algs.NeuralNet({'epochs': 100}),
+                 'Neural Network': algs.NeuralNet({'epochs': 100}),
 
                 }
     numalgs = len(classalgs)
 
     parameters = (
-         #{'regwgt': 0.0, 'nh': 2},
-         {'regwgt': 0.01, 'nh': 4},
-         #{'regwgt': 0.05, 'nh': 8},
-         #{'regwgt': 0.1, 'nh': 16},
+        #{'regwgt': 0.01, 'nh': 4},
+       # {'regwgt': 0.0, 'nh': 4},
+         {'regwgt': 0.01, 'nh': 8},
+      #  {'regwgt': 0.05, 'nh': 16},
+      #  {'regwgt': 0.1, 'nh': 32},
                       )
     numparams = len(parameters)
 
@@ -123,12 +127,15 @@ if __name__ == '__main__':
         errors[learnername] = np.zeros((numparams,numruns))
 
     for r in range(numruns):
-        trainset, testset = dtl.load_skin(trainsize,testsize,r)
-        print (trainset)
+        #trainset, testset = dtl.load_skin(trainsize,testsize,r)
 
-        print(('Running on train={0} and test={1} samples for run {2}').format(trainset[0].shape[0], testset[0].shape[0],r))
+
+        #print(('Running on train={0} and test={1} samples for run {2}').format(trainset[0].shape[0], testset[0].shape[0],r))
 
         for p in range(numparams):
+            trainset, testset = dtl.load_skin(trainsize,testsize,r)
+            print(('Running on train={0} and test={1} samples for run {2}').format(trainset[0].shape[0], testset[0].shape[0],r))
+
             params = parameters[p]
             for learnername, learner in classalgs.items():
                 # Reset learner for new parameters
@@ -142,6 +149,7 @@ if __name__ == '__main__':
                 print ('Error for ' + learnername + ': ' + str(error))
                 errors[learnername][p,r] = error
 
+
     w=[]
     w1 = []
     is_NN = 0
@@ -154,16 +162,16 @@ if __name__ == '__main__':
                 besterror = aveerror
                 bestparams = p
 
-        if(learnername == "Neural Network"):
-            is_NN = 1
-            w = learner.w_output
-        else:
-            w = learner.weights
-        # Extract best parameters
-        learner.reset(parameters[bestparams])
-
-        temp = testset[0]
-        plotgbr(temp,w,is_NN,learnername)
+        # if(learnername == "Neural Network"):
+        #     is_NN = 1
+        #     w = learner.w_output
+        # else:
+        #     w = learner.weights
+        # # Extract best parameters
+        # learner.reset(parameters[bestparams])
+        #
+        # temp = testset[0]
+        # plotgbr(temp,w,is_NN,learnername)
 
         print("")
         print ('Best parameters for ' + learnername + ': ' + str(learner.getparams()))
@@ -171,14 +179,15 @@ if __name__ == '__main__':
         print ('Average error for ' + learnername + ': ' + str(besterror) + ' +- ' + str(np.std(errors[learnername][bestparams,:])/math.sqrt(numruns)))
         #sample_std = np.std(errors[learnername],ddof=1) / np.sqrt(numparams)
         #print("Standard error for " +learnername + ": " + str(sample_std))
+
+    errorsList = []
     for i,j in classalgs.items():
+        errorList = []
         #print i + ":"
-        errorList = errors[i][0]
-        print (errorList)
+        for error in range(numparams):
+            for item in errors[i][error]:
+                errorList.append(item)
+        errorsList.append(errorList)
+    print (errorsList)
 
-    #draw points in 3D
-
-    Neural_Network = np.array([ 0.6,0.5,0.4,0.3,0.9,0.6,0.4,0.5,0.6,0.4])
-    Linear = np.array( [8,7.3,7.4 , 8.1,  6.3,  7.4,  9.1,  6.4,  7.3,  7.4])
-    Logistic = np.array([ 7.7 , 7.3,  7.3,  8.4,  6.9,  7.2,  9.4,  5.8,  7.5,  8.2])
-    ttestHo(Neural_Network,Linear,Logistic)
+    ttestHo(errorsList)

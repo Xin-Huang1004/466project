@@ -205,7 +205,7 @@ class NeuralNet(Classifier):
     the default params will affect the points you get.
     """
     def __init__(self, parameters={}):
-        self.params = {'nh': 8,
+        self.params = {'nh': 4,
                     'transfer': 'sigmoid',
                     'stepsize': 0.01,
                     'epochs': 100}
@@ -308,54 +308,16 @@ class NeuralNet(Classifier):
                 #update w_input and w_output
                 n_input,n_output = self.backprop(shuffle_x[i], shuffle_y[i])
                 self.w_input -= self.stepsize * n_input
-                self.w_output-= self.stepsize * n_output
+                self.w_output -= self.stepsize * n_output
 
 
     def predict(self, Xtest):
         hidden = utils.sigmoid(np.dot(Xtest, self.w_input.T))
-        #print Xtest
-        #print self.w_input.T
-
         ytest = utils.sigmoid(np.dot(hidden, self.w_output.T))
-       # w = self.w_output
 
         for i in range(len(ytest)):
-            #print Xtest[i],ytest[i]
             if ytest[i] <= 0.5:
                 ytest[i] = 0
             else:
                 ytest[i] = 1
-
-        # fig = plt.figure()
-        # ax = fig.add_subplot(111, projection='3d')
-
-        # xs0=[]
-        # ys0=[]
-        # zs0=[]
-        # xs1=[]
-        # ys1=[]
-        # zs1=[]
-        # for i in range(len(Xtest)):
-        #     if(ytest[i] == 0):
-        #         xs0.append(hidden[i][0])
-        #         ys0.append(hidden[i][1])
-        #         zs0.append(hidden[i][2])
-        #     else:
-        #         xs1.append(hidden[i][0])
-        #         ys1.append(hidden[i][1])
-        #         zs1.append(hidden[i][2])
-        # ax.scatter(xs0, ys0, zs0,c = 'r',marker = "^")
-        # ax.scatter(xs1, ys1, zs1,c = 'b',marker = "o")
-        # #draw surface
-        # x = y = np.arange(0, 1.0, 0.005)
-        # X, Y = np.meshgrid(x, y)
-        # zs = np.array([self.fun(x,y,w[0][0],w[0][1],w[0][2],w[0][3]) for x,y in zip(np.ravel(X), np.ravel(Y))])
-        # Z = zs.reshape(X.shape)
-        # ax.plot_surface(X, Y, Z,edgecolors='black')
-
-        # ax.set_xlabel('X Label')
-        # ax.set_ylabel('Y Label')
-        # ax.set_zlabel('Z Label')
-
-       # plt.show()
         return ytest

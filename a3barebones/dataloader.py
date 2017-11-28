@@ -8,9 +8,9 @@ def load_skin(trainsize=500, testsize=1000,numruns = 1):
     """ A physics classification dataset """
     filename = 'datasets/result_1.txt'
     dataset = np.loadtxt(filename)
-    trainset, testset = splitdataset(numruns,dataset,trainsize, testsize)    
+    trainset, testset = splitdataset(numruns,dataset,trainsize, testsize)
     return trainset,testset
- 
+
 ####### Helper functions
 def splitdataset(numruns,dataset, trainsize, testsize, testdataset=None, featureoffset=None, outputfirst=None):
     """
@@ -49,7 +49,7 @@ def splitdataset(numruns,dataset, trainsize, testsize, testdataset=None, feature
     for i in range(10):
         data_list = []
         #print i*10000,(i+1)*10000
-        for index in range(i*1000,(i+1)*1000):
+        for index in range(i*10000,(i+1)*10000):
             data_list.append(index)
         split_list.append(data_list)
 
@@ -63,14 +63,14 @@ def splitdataset(numruns,dataset, trainsize, testsize, testdataset=None, feature
 
 
     featureend = dataset.shape[1]-1
-    outputlocation = featureend    
+    outputlocation = featureend
     if featureoffset is None:
         featureoffset = 0
     if outputfirst is not None:
         featureoffset = featureoffset + 1
         featureend = featureend + 1
         outputlocation = 0
-    
+
     Xtrain = dataset[randindices[0:trainsize],featureoffset:featureend]
     ytrain = dataset[randindices[0:trainsize],outputlocation]
     Xtest = dataset[randindices[trainsize:trainsize+testsize],featureoffset:featureend]
@@ -79,19 +79,18 @@ def splitdataset(numruns,dataset, trainsize, testsize, testdataset=None, feature
 
     if testdataset is not None:
         Xtest = dataset[:,featureoffset:featureend]
-        ytest = dataset[:,outputlocation]        
+        ytest = dataset[:,outputlocation]
 
     # Normalize features, with maximum value in training set
-    # as realistically, this would be the only possibility    
+    # as realistically, this would be the only possibility
     for ii in range(Xtrain.shape[1]):
         maxval = np.max(np.abs(Xtrain[:,ii]))
         if maxval > 0:
             Xtrain[:,ii] = np.divide(Xtrain[:,ii], maxval)
             Xtest[:,ii] = np.divide(Xtest[:,ii], maxval)
-                        
+
     # Add a column of ones; done after to avoid modifying entire dataset
     Xtrain = np.hstack((Xtrain, np.ones((Xtrain.shape[0],1))))
     Xtest = np.hstack((Xtest, np.ones((Xtest.shape[0],1))))
-                              
-    return ((Xtrain,ytrain), (Xtest,ytest))
 
+    return ((Xtrain,ytrain), (Xtest,ytest))

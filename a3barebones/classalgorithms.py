@@ -308,22 +308,17 @@ class NeuralNet(Classifier):
                 #update w_input and w_output
                 n_input,n_output = self.backprop(shuffle_x[i], shuffle_y[i])
                 self.w_input -= self.stepsize * n_input
-<<<<<<< HEAD
                 self.w_output-= self.stepsize * n_output
-=======
-                self.w_output -= self.stepsize * n_output
-    def fun(self,x1,x2,w1,w2,w3,w0):
-        return (-x1*w1-x2*w2-w0)/w3
->>>>>>> de1136e30b7aea3c63ed708489ed6579f959f92b
+
 
     def predict(self, Xtest):
         hidden = utils.sigmoid(np.dot(Xtest, self.w_input.T))
-        print Xtest
-        print self.w_input.T
+        #print Xtest
+        #print self.w_input.T
 
         ytest = utils.sigmoid(np.dot(hidden, self.w_output.T))
        # w = self.w_output
-    
+
         for i in range(len(ytest)):
             #print Xtest[i],ytest[i]
             if ytest[i] <= 0.5:
@@ -336,10 +331,10 @@ class NeuralNet(Classifier):
 
         # xs0=[]
         # ys0=[]
-        # zs0=[]    
+        # zs0=[]
         # xs1=[]
         # ys1=[]
-        # zs1=[]  
+        # zs1=[]
         # for i in range(len(Xtest)):
         #     if(ytest[i] == 0):
         #         xs0.append(hidden[i][0])

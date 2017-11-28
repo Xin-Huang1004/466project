@@ -205,7 +205,7 @@ class NeuralNet(Classifier):
     the default params will affect the points you get.
     """
     def __init__(self, parameters={}):
-        self.params = {'nh': 8,
+        self.params = {'nh': 4,
                     'transfer': 'sigmoid',
                     'stepsize': 0.01,
                     'epochs': 100}

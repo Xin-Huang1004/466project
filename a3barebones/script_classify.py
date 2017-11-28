@@ -38,18 +38,18 @@ if __name__ == '__main__':
     numruns = 1
 
     classalgs = {#'Random': algs.Classifier(),
-                 'Linear Regression': algs.LinearRegressionClass(),
+                 #'Linear Regression': algs.LinearRegressionClass(),
                  #'Logistic Regression': algs.LogitReg(),
-                 #'Neural Network': algs.NeuralNet({'epochs': 100}),
+                 'Neural Network': algs.NeuralNet({'epochs': 100}),
 
                 }
     numalgs = len(classalgs)
 
     parameters = (
         {'regwgt': 0.0, 'nh': 4},
-       # {'regwgt': 0.01, 'nh': 8},
-        #{'regwgt': 0.05, 'nh': 16},
-        #{'regwgt': 0.1, 'nh': 32},
+        {'regwgt': 0.01, 'nh': 8},
+        {'regwgt': 0.05, 'nh': 16},
+        {'regwgt': 0.1, 'nh': 32},
                       )
     numparams = len(parameters)
 
@@ -58,12 +58,15 @@ if __name__ == '__main__':
         errors[learnername] = np.zeros((numparams,numruns))
 
     for r in range(numruns):
-        trainset, testset = dtl.load_skin(trainsize,testsize,r)
-        print (trainset)
+        #trainset, testset = dtl.load_skin(trainsize,testsize,r)
 
-        print(('Running on train={0} and test={1} samples for run {2}').format(trainset[0].shape[0], testset[0].shape[0],r))
+
+        #print(('Running on train={0} and test={1} samples for run {2}').format(trainset[0].shape[0], testset[0].shape[0],r))
 
         for p in range(numparams):
+            trainset, testset = dtl.load_skin(trainsize,testsize,r)
+            print(('Running on train={0} and test={1} samples for run {2}').format(trainset[0].shape[0], testset[0].shape[0],r))
+
             params = parameters[p]
             for learnername, learner in classalgs.items():
                 # Reset learner for new parameters

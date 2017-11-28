@@ -303,7 +303,7 @@ class NeuralNet(Classifier):
                 #update w_input and w_output
                 n_input,n_output = self.backprop(shuffle_x[i], shuffle_y[i])
                 self.w_input -= self.stepsize * n_input
-                self.w_output -= self.stepsize * n_output
+                self.w_output-= self.stepsize * n_output
 
     def predict(self, Xtest):
         hidden = utils.sigmoid(np.dot(Xtest, self.w_input.T))

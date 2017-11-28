@@ -28,14 +28,14 @@ def fun(x1,x2,w1,w2,w3,w0):
     '''
     return (-x1*w1-x2*w2-w0)/w3
 
-
 if __name__ == '__main__':
     trainsize = 9000
     testsize =  1000
-    numruns = 1
+    numruns = 10
 
     classalgs = {#'Random': algs.Classifier(),
-                 'Linear Regression': algs.LinearRegressionClass(),
+                 #'Naive Bayes': algs.NaiveBayes({'usecolumnones': False}),
+                 #'Linear Regression': algs.LinearRegressionClass(),
                  #'Logistic Regression': algs.LogitReg(),
                  #'Neural Network': algs.NeuralNet({'epochs': 100}),
 
@@ -43,10 +43,10 @@ if __name__ == '__main__':
     numalgs = len(classalgs)
 
     parameters = (
-       # {'regwgt': 0.0, 'nh': 4},
-        {'regwgt': 0.01, 'nh': 8},
-        #{'regwgt': 0.05, 'nh': 16},
-        #{'regwgt': 0.1, 'nh': 32},
+         {'regwgt': 0.0, 'nh': 4},
+         #{'regwgt': 0.01, 'nh': 8},
+         #{'regwgt': 0.05, 'nh': 16},
+         #{'regwgt': 0.1, 'nh': 32},
                       )
     numparams = len(parameters)
 
@@ -83,7 +83,10 @@ if __name__ == '__main__':
             if aveerror < besterror:
                 besterror = aveerror
                 bestparams = p
-        w=learner.weights
+        #w=learner.weights
+        #w=learner.w_output[0]
+        w=learner.w_input[0]
+        print(w)
         # Extract best parameters
         learner.reset(parameters[bestparams])
         print("")
@@ -101,16 +104,25 @@ if __name__ == '__main__':
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
-    xs=[]
-    ys=[]
-    zs=[]
-    for item in range(len(testset)-1):
-        for i in testset[item]:
-            xs.append(i[0])
-            ys.append(i[1])
-            zs.append(i[2])
+    xs0=[]
+    ys0=[]
+    zs0=[]
+    xs1=[]
+    ys1=[]
+    zs1=[]
 
-    ax.scatter(xs, ys, zs)
+    for i in range(len(testset[0])):
+        if(testset[1][i]==0):
+            #print(testset[0][i][0])
+            xs0.append(testset[0][i][0])
+            ys0.append(testset[0][i][1])
+            zs0.append(testset[0][i][2])
+        if(testset[1][i]==1):
+            xs1.append(testset[0][i][0])
+            ys1.append(testset[0][i][1])
+            zs1.append(testset[0][i][2])
+    ax.scatter(xs0, ys0, zs0,c = 'r',marker = "^")
+    ax.scatter(xs1, ys1, zs1,c = 'b',marker = "o")
     #draw surface
     x = y = np.arange(0, 1.0, 0.005)
     X, Y = np.meshgrid(x, y)

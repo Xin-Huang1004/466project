@@ -20,7 +20,7 @@ def splitdataset(numruns,dataset, trainsize, testsize, testdataset=None, feature
     Assumes output variable is the last variable
     """
     # Generate random indices without replacement, to make train and test sets disjoint
-    #np.random.seed(123)
+    np.random.seed(123)
     #randindices = np.random.choice(dataset.shape[0],trainsize+testsize, replace=False)
     randindices = []
    #  trainsizeRange = int(trainsize/2)

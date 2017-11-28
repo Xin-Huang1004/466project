@@ -69,6 +69,7 @@ class LinearRegressionClass(Classifier):
         ytest = np.dot(Xtest, self.weights)
         ytest[ytest > 0] = 1
         ytest[ytest < 0] = 0
+        #print self.weights
         return ytest
 
 class NaiveBayes(Classifier):
@@ -291,6 +292,7 @@ class LogitReg(Classifier):
         ### YOUR CODE HERE
 
         ytest = utils.sigmoid(np.dot(Xtest, self.weights))
+        #print self.weights
 
         for i in range(len(ytest)):
 

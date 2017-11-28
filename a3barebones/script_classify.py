@@ -75,15 +75,19 @@ if __name__ == '__main__':
             if aveerror < besterror:
                 besterror = aveerror
                 bestparams = p
-
+       
+        print learner.weights
         # Extract best parameters
         learner.reset(parameters[bestparams])
         print("")
         print ('Best parameters for ' + learnername + ': ' + str(learner.getparams()))
+
         print ('Average error for ' + learnername + ': ' + str(besterror) + ' +- ' + str(np.std(errors[learnername][bestparams,:])/math.sqrt(numruns)))
+        #sample_std = np.std(errors[learnername],ddof=1) / np.sqrt(numparams)
+        #print("Standard error for " +learnername + ": " + str(sample_std))
     for i,j in classalgs.items():
         print i + ":"
         errorList = errors[i][0]
         print errorList
-        #sample_std = np.std(errors[learnername],ddof=1) / np.sqrt(numparams)
-        #print("Standard error for " +learnername + ": " + str(sample_std))
+        
+

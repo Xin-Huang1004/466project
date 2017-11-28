@@ -309,14 +309,10 @@ class NeuralNet(Classifier):
                 n_input,n_output = self.backprop(shuffle_x[i], shuffle_y[i])
                 self.w_input -= self.stepsize * n_input
                 self.w_output -= self.stepsize * n_output
-    def fun(self,x1,x2,w1,w2,w3,w0):
-        return (-x1*w1-x2*w2-w0)/w3
+
 
     def predict(self, Xtest):
         hidden = utils.sigmoid(np.dot(Xtest, self.w_input.T))
-        print Xtest
-        print self.w_input.T
-
         ytest = utils.sigmoid(np.dot(hidden, self.w_output.T))
        # w = self.w_output
     
@@ -326,37 +322,4 @@ class NeuralNet(Classifier):
                 ytest[i] = 0
             else:
                 ytest[i] = 1
-
-        # fig = plt.figure()
-        # ax = fig.add_subplot(111, projection='3d')
-
-        # xs0=[]
-        # ys0=[]
-        # zs0=[]    
-        # xs1=[]
-        # ys1=[]
-        # zs1=[]  
-        # for i in range(len(Xtest)):
-        #     if(ytest[i] == 0):
-        #         xs0.append(hidden[i][0])
-        #         ys0.append(hidden[i][1])
-        #         zs0.append(hidden[i][2])
-        #     else:
-        #         xs1.append(hidden[i][0])
-        #         ys1.append(hidden[i][1])
-        #         zs1.append(hidden[i][2])
-        # ax.scatter(xs0, ys0, zs0,c = 'r',marker = "^")
-        # ax.scatter(xs1, ys1, zs1,c = 'b',marker = "o")
-        # #draw surface
-        # x = y = np.arange(0, 1.0, 0.005)
-        # X, Y = np.meshgrid(x, y)
-        # zs = np.array([self.fun(x,y,w[0][0],w[0][1],w[0][2],w[0][3]) for x,y in zip(np.ravel(X), np.ravel(Y))])
-        # Z = zs.reshape(X.shape)
-        # ax.plot_surface(X, Y, Z,edgecolors='black')
-
-        # ax.set_xlabel('X Label')
-        # ax.set_ylabel('Y Label')
-        # ax.set_zlabel('Z Label')
-
-       # plt.show()
         return ytest

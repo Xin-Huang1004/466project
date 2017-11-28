@@ -31,25 +31,26 @@ def fun(x1,x2,w1,w2,w3,w0):
     '''
     return ((-x1*w1-x2*w2-w0)/w3)
 
-
 if __name__ == '__main__':
     trainsize = 9000
     testsize =  1000
-    numruns = 1
+    numruns = 10
 
-    classalgs = {#'Random': algs.Classifier(),
-                 #'Linear Regression': algs.LinearRegressionClass(),
-                 #'Logistic Regression': algs.LogitReg(),
+    classalgs = {
+                 'Linear Regression': algs.LinearRegressionClass(),
+                 'Logistic Regression': algs.LogitReg(),
                  'Neural Network': algs.NeuralNet({'epochs': 100}),
 
                 }
     numalgs = len(classalgs)
 
     parameters = (
-        {'regwgt': 0.0, 'nh': 4},
-        {'regwgt': 0.01, 'nh': 8},
-        {'regwgt': 0.05, 'nh': 16},
-        {'regwgt': 0.1, 'nh': 32},
+        {'regwgt': 0.01, 'nh': 4},
+       # {'regwgt': 0.0, 'nh': 4},
+      #  {'regwgt': 0.01, 'nh': 8},
+      #  {'regwgt': 0.05, 'nh': 16},
+      #  {'regwgt': 0.1, 'nh': 32},
+
                       )
     numparams = len(parameters)
 
@@ -80,6 +81,7 @@ if __name__ == '__main__':
                 print ('Error for ' + learnername + ': ' + str(error))
                 errors[learnername][p,r] = error
 
+
     w=[]
     w1 = []
     is_NN = 0
@@ -91,15 +93,13 @@ if __name__ == '__main__':
             if aveerror < besterror:
                 besterror = aveerror
                 bestparams = p
- 
+
         if(learnername == "Neural Network"):
             is_NN = 1
             w = learner.w_output
             w1 = learner.w_input
         else:
             w = learner.weights
-
-
         # Extract best parameters
         learner.reset(parameters[bestparams])
         print("")
@@ -108,60 +108,65 @@ if __name__ == '__main__':
         print ('Average error for ' + learnername + ': ' + str(besterror) + ' +- ' + str(np.std(errors[learnername][bestparams,:])/math.sqrt(numruns)))
         #sample_std = np.std(errors[learnername],ddof=1) / np.sqrt(numparams)
         #print("Standard error for " +learnername + ": " + str(sample_std))
+   
+    errorsList = []
     for i,j in classalgs.items():
-        #print i + ":"
-        errorList = errors[i][0]
-        print (errorList)
+        errorList = []
+        print i + ":"
+        for error in range(numparams):
+            for item in errors[i][error]:
+                errorList.append(item)
+        errorsList.append(errorList)
+    print (errorsList)
+
 
     #draw points in 3D
-    temp = testset[0]
-    # print temp
-    if(is_NN == 1):
-        temp = utils.sigmoid(np.dot(testset[0], w1.T))
-   
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
+    # temp = testset[0]
+    # # print temp
+    # if(is_NN == 1):
+    #     temp = utils.sigmoid(np.dot(testset[0], w1.T))
 
-#    print temp
+    # fig = plt.figure()
+    # ax = fig.add_subplot(111, projection='3d')
 
-    xs0=[]
-    ys0=[]
-    zs0=[]    
-    xs1=[]
-    ys1=[]
-    zs1=[]  
-    for i in range(len(temp)):
-        if(testset[1][i] == 0):
-            xs0.append(temp[i][0])
-            ys0.append(temp[i][1])
-            zs0.append(temp[i][2])
-        else:
-            xs1.append(temp[i][0])
-            ys1.append(temp[i][1])
-            zs1.append(temp[i][2])
-    ax.scatter(xs0, ys0, zs0,c = 'r',marker = "^")
-    ax.scatter(xs1, ys1, zs1,c = 'b',marker = "o")
+    # xs0=[]
+    # ys0=[]
+    # zs0=[]
+    # xs1=[]
+    # ys1=[]
+    # zs1=[]
+    # for i in range(len(temp)):
+    #     if(testset[1][i] == 0):
+    #         xs0.append(temp[i][0])
+    #         ys0.append(temp[i][1])
+    #         zs0.append(temp[i][2])
+    #     else:
+    #         xs1.append(temp[i][0])
+    #         ys1.append(temp[i][1])
+    #         zs1.append(temp[i][2])
+    # ax.scatter(xs0, ys0, zs0,c = 'r',marker = "^")
+    # ax.scatter(xs1, ys1, zs1,c = 'b',marker = "o")
 
-    #draw surface
-    x = y = np.arange(0, 1.0, 0.005)
-    X, Y = np.meshgrid(x, y)
-    if(is_NN == 1):
-        zs = np.array([fun(x,y,w[0][0],w[0][1],w[0][2],w[0][3]) for x,y in zip(np.ravel(X), np.ravel(Y))])
-    else:
-        zs = np.array([fun(x,y,w[0],w[1],w[2],w[3]) for x,y in zip(np.ravel(X), np.ravel(Y))])
-    Z = zs.reshape(X.shape)
-    ax.plot_surface(X, Y, Z,edgecolors='black')
+    # #draw surface
+    # x = y = np.arange(0, 1.0, 0.005)
+    # X, Y = np.meshgrid(x, y)
+    # if(is_NN == 1):
+    #     zs = np.array([fun(x,y,w[0][0],w[0][1],w[0][2],w[0][3]) for x,y in zip(np.ravel(X), np.ravel(Y))])
+    # else:
+    #     zs = np.array([fun(x,y,w[0],w[1],w[2],w[3]) for x,y in zip(np.ravel(X), np.ravel(Y))])
+    # Z = zs.reshape(X.shape)
+    # ax.plot_surface(X, Y, Z,edgecolors='black')
 
-    ax.set_xlabel('X Label')
-    ax.set_ylabel('Y Label')
-    ax.set_zlabel('Z Label')
+    # ax.set_xlabel('X Label')
+    # ax.set_ylabel('Y Label')
+    # ax.set_zlabel('Z Label')
 
-    plt.show()
+    # plt.show()
 
 
-    Neural_Network = np.array([ 0.6,0.5,0.4,0.3,0.9,0.6,0.4,0.5,0.6,0.4])
-    Linear = np.array( [8,7.3,7.4 , 8.1,  6.3,  7.4,  9.1,  6.4,  7.3,  7.4])
-    Logistic = np.array([ 7.7 , 7.3,  7.3,  8.4,  6.9,  7.2,  9.4,  5.8,  7.5,  8.2])
+    Neural_Network = np.array(errorsList[0])
+    Linear = np.array(errorsList[1])
+    Logistic = np.array(errorsList[2])
     #num_run = [1,2,3,4,5,6,7,8,9,10]
     # test NN is better than linear?
     alpha = 0.05
@@ -185,4 +190,3 @@ if __name__ == '__main__':
         print("Reject h0,Linear is better")
     else:
         print("Fail to reject h0")
-

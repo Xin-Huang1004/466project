@@ -71,129 +71,6 @@ class LinearRegressionClass(Classifier):
         ytest[ytest < 0] = 0
         return ytest
 
-class NaiveBayes(Classifier):
-    """ Gaussian naive Bayes;  """
-
-    def __init__(self, parameters={}):
-        """ Params can contain any useful parameters for the algorithm """
-        # Assumes that a bias unit has been added to feature vector as the last feature
-        # If usecolumnones is False, it should ignore this last feature
-        self.params = {'usecolumnones': True}
-        self.reset(parameters)
-
-    def reset(self, parameters):
-        self.resetparams(parameters)
-        self.means = []
-        self.stds = []
-        self.numfeatures = 0
-        self.numclasses = 0
-
-    def learn(self, Xtrain, ytrain):
-        """
-        In the first code block, you should set self.numclasses and
-        self.numfeatures correctly based on the inputs and the given parameters
-        (use the column of ones or not).
-
-        In the second code block, you should compute the parameters for each
-        feature. In this case, they're mean and std for Gaussian distribution.
-        """
-
-        ### YOUR CODE HERE
-
-        # check the number of classes
-        num_of_classes = []
-        for i in ytrain:
-            if i not in num_of_classes:
-                num_of_classes.append(i)
-
-        # set numclasses and numfeatures
-        self.numclasses = len(num_of_classes)
-        self.numfeatures = Xtrain.shape[1]-1
-        if (self.params['usecolumnones'] == True):
-            self.numfeatures += 1
-
-        ### END YOUR CODE
-
-        origin_shape = (self.numclasses, self.numfeatures)
-        self.means = np.zeros(origin_shape)
-        self.stds = np.zeros(origin_shape)
-
-        ### YOUR CODE HERE
-
-        # split data by class(y value is 0 or 1)
-        class_0 = []
-        class_1 = []
-        for i in range(len(ytrain)):
-            if ytrain[i] == 0:
-                class_0.append(Xtrain[i])
-            if ytrain[i] == 1:
-                class_1.append(Xtrain[i])
-
-        # mean and std for class_0
-        for i in range(self.numfeatures):
-            feature = []
-            for j in range(len(class_0)):
-                feature.append(class_0[j][i])
-            self.means[0][i] = (utils.mean(feature))
-            self.stds[0][i] = (utils.stdev(feature))
-
-        # for item in range(self.numfeatures):
-        #     self.means[0][item] = (utils.mean(feature_0_list[item]))
-        #     self.stds[0][item] = (utils.stdev(feature_0_list[item]))
-
-        # mean and std for class_1
-        for i in range(self.numfeatures):
-            feature = []
-            for j in range(len(class_1)):
-                feature.append(class_1[j][i])
-            self.means[1][i] = (utils.mean(feature))
-            self.stds[1][i] = (utils.stdev(feature))
-        
-        ### END YOUR CODE
-        assert self.means.shape == origin_shape
-        assert self.stds.shape == origin_shape
-
-    def predict(self, Xtest):
-        """
-        Use the parameters computed in self.learn to give predictions on new
-        observations.
-        """
-        ytest = np.zeros(Xtest.shape[0], dtype=int)
-    
-        ### YOUR CODE HERE
-
-        for i in range(len(Xtest)):
-            probility_0 = 1
-            probility_1 = 1
-            # calculate probability for class 0
-            for j in range(self.numfeatures):
-                temp = ((Xtest[i][j] - self.means[0][j]) * (Xtest[i][j] - self.means[0][j])) / (2 * self.stds[0][j] * self.stds[0][j])
-                e = np.exp(-temp)
-               # e = math.exp(-(math.pow((Xtest[i][j] - self.means[0][j]), 2) / (2 * math.pow(self.stds[0][j], 2))))
-                probility_0 *= (1 / (np.sqrt(2 * np.pi) * self.stds[0][j])) * e
-
-            for j in range(self.numfeatures):
-                # e = math.exp(-(math.pow(Xtest[i][j] - self.means[1][j],2))/(2*math.pow(self.stds[1][j],2)))
-                # probility_1 *= (1 / (math.sqrt(2*math.pi) * math.pow(self.stds[1][j],2))) * e
-
-                # calculate probability for class 1
-                # temp = ((Xtest[i][j] - self.means[1][j]) * (Xtest[i][j] - self.means[1][j])) / (2 * self.stds[1][j] * self.stds[1][j])
-                # e = np.exp(-temp)
-                # probility_1 *= (1 / (np.sqrt(2 * np.pi) * self.stds[1][j])) * e
-                e = math.exp(-(math.pow(Xtest[i][j]-self.means[1][j], 2)/( 2 * math.pow(self.stds[1][j], 2))))
-                probility_1 *= (1 / (math.sqrt(2*math.pi) * self.stds[1][j])) * e
-
-            # print("class 0: " + str(probility_0) + "  class 1: " + str(probility_1))
-            # set predict value for y
-            if probility_0 > probility_1:
-                ytest[i] = 0
-            else:
-                ytest[i] = 1
-
-        ### END YOUR CODE
-
-        assert len(ytest) == Xtest.shape[0]
-        return ytest
 
 class LogitReg(Classifier):
 
@@ -221,7 +98,7 @@ class LogitReg(Classifier):
         cost = 0.0
 
         ### YOUR CODE HERE
-            
+
         Xw = np.dot(X,theta)
         sigXw = utils.sigmoid(Xw)
         #print sigXw
@@ -247,7 +124,7 @@ class LogitReg(Classifier):
 
         sig = utils.sigmoid(np.dot(X,theta))
         grad = np.dot(X.T, np.subtract(sig,y))
-        
+
         ### END YOUR CODE
         return grad
 
@@ -279,7 +156,7 @@ class LogitReg(Classifier):
 
         ### END YOUR CODE
 
-        
+
 
     def predict(self, Xtest):
         """
@@ -359,21 +236,21 @@ class NeuralNet(Classifier):
         """
 
         ### YOUR CODE HERE
-    
+
         # get hidden and y hat
         a_h, y_Hat = self.feedforward(x)
-        
-        # get delta1 
+
+        # get delta1
         delta1 = (y_Hat - y)
         # get delta2
         delta2 =(np.dot(self.w_output.T, delta1) * (a_h * (1 - a_h)))
         # reshape delta2 and x
         delta2 = np.reshape(delta2, (self.nh,self.no))
         x = np.reshape(x, (self.no, self.ni))
-       
+
         # get nabla input and output
         nabla_output = (delta1 * a_h)
-        nabla_output = np.reshape(nabla_output, (self.no, self.nh))        
+        nabla_output = np.reshape(nabla_output, (self.no, self.nh))
         nabla_input = np.dot(delta2, x)
 
         ### END YOUR CODE
@@ -384,8 +261,8 @@ class NeuralNet(Classifier):
 
     # TODO: implement learn and predict functions
     def learn(self, Xtrain, ytrain):
-        print Xtrain
-        print ytrain
+        #print Xtrain
+        #print ytrain
         zerocount = 0
         onecount = 0
         for i in ytrain:
@@ -393,7 +270,7 @@ class NeuralNet(Classifier):
                 zerocount+=1
             else:
                 onecount+=1
-        print zerocount, onecount
+        #print zerocount, onecount
         # set value
         self.stepsize = self.params['stepsize']
         self.epochs = self.params['epochs']
@@ -405,7 +282,7 @@ class NeuralNet(Classifier):
         self.no = 1
 
         # w_input and w_output are two random matrix(value from -1 to 1)
-        self.w_input = - 1 + 2 * np.random.random((self.nh,self.ni)) 
+        self.w_input = - 1 + 2 * np.random.random((self.nh,self.ni))
         self.w_output = - 1 + 2 * np.random.random((self.no,self.nh))
 
         # get shuffle list
@@ -428,7 +305,7 @@ class NeuralNet(Classifier):
                 self.w_input -= self.stepsize * n_input
                 self.w_output -= self.stepsize * n_output
 
-    def predict(self, Xtest): 
+    def predict(self, Xtest):
         hidden = utils.sigmoid(np.dot(Xtest, self.w_input.T))
         ytest = utils.sigmoid(np.dot(hidden, self.w_output.T))
 
@@ -437,59 +314,5 @@ class NeuralNet(Classifier):
             if ytest[i] <= 0.5:
                 ytest[i] = 0
             else:
-                ytest[i] = 1 
+                ytest[i] = 1
         return ytest
-
-# ======================================================================
-
-def test_lr():
-    print("Basic test for logistic regression...")
-    clf = LogitReg()
-    theta = np.array([0.])
-    X = np.array([[1.]])
-    y = np.array([0])
-
-    try:
-        cost = clf.logit_cost(theta, X, y)
-    except:
-        raise AssertionError("Incorrect input format for logit_cost!")
-    assert isinstance(cost, float), "logit_cost should return a float!"
-
-    try:
-        grad = clf.logit_cost_grad(theta, X, y)
-    except:
-        raise AssertionError("Incorrect input format for logit_cost_grad!")
-    assert isinstance(grad, np.ndarray), "logit_cost_grad should return a numpy array!"
-
-    print("Test passed!")
-    print("-" * 50)
-
-def test_nn():
-    print("Basic test for neural network...")
-    clf = NeuralNet()
-    X = np.array([[1., 2.], [2., 1.]])
-    y = np.array([0, 1])
-    clf.learn(X, y)
-
-    assert isinstance(clf.w_input, np.ndarray), "w_input should be a numpy array!"
-    assert isinstance(clf.w_output, np.ndarray), "w_output should be a numpy array!"
-
-    try:
-        res = clf.feedforward(X[0, :])
-    except:
-        raise AssertionError("feedforward doesn't work!")
-
-    try:
-        res = clf.backprop(X[0, :], y[0])
-    except:
-        raise AssertionError("backprob doesn't work!")
-
-    print("Test passed!")
-    print("-" * 50)
-
-def main():
-    test_lr()
-    test_nn()
-
-if __name__ == "__main__":
-    main()

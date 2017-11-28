@@ -22,22 +22,19 @@ def geterror(ytest, predictions):
     return (100.0-getaccuracy(ytest, predictions))
 
 
-def randrange(n, vmin, vmax):
+def fun(x1,x2,w1,w2,w3,w0):
     '''
-    Helper function to make an array of random numbers having shape (n, )
-    with each number distributed Uniform(vmin, vmax).
+    return x3 accroding weights and x1 x2
     '''
-    return (vmax - vmin)*np.random.rand(n) + vmin
+    return (-x1*w1-x2*w2-w0)/w3
 
 
 if __name__ == '__main__':
-    trainsize = 10000
-    testsize =  10000
-    numruns = 2
+    trainsize = 9000
+    testsize =  1000
+    numruns = 1
 
     classalgs = {#'Random': algs.Classifier(),
-                 #'Naive Bayes': algs.NaiveBayes({'usecolumnones': False}),
-                 #'Naive Bayes Ones': algs.NaiveBayes({'usecolumnones': True}),
                  'Linear Regression': algs.LinearRegressionClass(),
                  #'Logistic Regression': algs.LogitReg(),
                  #'Neural Network': algs.NeuralNet({'epochs': 100}),
@@ -46,9 +43,9 @@ if __name__ == '__main__':
     numalgs = len(classalgs)
 
     parameters = (
-        #{'regwgt': 0.0, 'nh': 4},
-        #{'regwgt': 0.01, 'nh': 8},
-        {'regwgt': 0.05, 'nh': 16},
+       # {'regwgt': 0.0, 'nh': 4},
+        {'regwgt': 0.01, 'nh': 8},
+        #{'regwgt': 0.05, 'nh': 16},
         #{'regwgt': 0.1, 'nh': 32},
                       )
     numparams = len(parameters)
@@ -77,7 +74,7 @@ if __name__ == '__main__':
                 print ('Error for ' + learnername + ': ' + str(error))
                 errors[learnername][p,r] = error
 
-
+    w=[]
     for learnername, learner in classalgs.items():
         besterror = np.mean(errors[learnername][0,:])
         bestparams = 0
@@ -86,12 +83,13 @@ if __name__ == '__main__':
             if aveerror < besterror:
                 besterror = aveerror
                 bestparams = p
-
+        w=learner.weights
         # Extract best parameters
         learner.reset(parameters[bestparams])
         print("")
         print ('Best parameters for ' + learnername + ': ' + str(learner.getparams()))
         #print ('Average error for ' + learnername + ': ' + str(besterror) + ' +- ' + str(np.std(errors[learnername][bestparams,:])/math.sqrt(numruns)))
+
     for i,j in classalgs.items():
         #print i + ":"
         errorList = errors[i][0]
@@ -99,15 +97,26 @@ if __name__ == '__main__':
         #sample_std = np.std(errors[learnername],ddof=1) / np.sqrt(numparams)
         #print("Standard error for " +learnername + ": " + str(sample_std))
 
+    #draw points in 3D
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
 
-    for c, m, zlow, zhigh in [('r', 'o', -50, -25), ('b', '^', -30, -5)]:
-        xs = randrange(n, 23, 32)
-        ys = randrange(n, 0, 100)
-        zs = randrange(n, zlow, zhigh)
-        ax.scatter(xs, ys, zs, c=c, marker=m)
+    xs=[]
+    ys=[]
+    zs=[]
+    for item in range(len(testset)-1):
+        for i in testset[item]:
+            xs.append(i[0])
+            ys.append(i[1])
+            zs.append(i[2])
 
+    ax.scatter(xs, ys, zs)
+    #draw surface
+    x = y = np.arange(0, 1.0, 0.005)
+    X, Y = np.meshgrid(x, y)
+    zs = np.array([fun(x,y,w[0],w[1],w[2],w[3]) for x,y in zip(np.ravel(X), np.ravel(Y))])
+    Z = zs.reshape(X.shape)
+    ax.plot_surface(X, Y, Z,edgecolors='r')
 
     ax.set_xlabel('X Label')
     ax.set_ylabel('Y Label')

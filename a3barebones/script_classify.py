@@ -77,7 +77,7 @@ def t_test(errorslist):
     Linear = np.array(errorslist[1])
     Logistic = np.array(errorslist[2])
     # test NN is better than linear?
-    alpha = 0.05
+    alpha = 0.01
     t,p = stats.ttest_ind(Neural_Network,Linear,equal_var=False)
     print('t-value is: %f,  p-vaule is: %f'%(t,p))
     if p < alpha:
@@ -101,8 +101,8 @@ def t_test(errorslist):
 
 
 if __name__ == '__main__':
-    trainsize = 9000
-    testsize =  1000
+    trainsize = 90000
+    testsize =  10000
     numruns = 10
 
     classalgs = {

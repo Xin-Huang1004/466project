@@ -72,7 +72,7 @@ def plotgbr(temp,w,is_NN,learnername):
     ax.set_title(learnername)
     plt.show()
 
-def ttestHo(errorslist):
+def t_test(errorslist):
     Neural_Network = np.array(errorslist[0])
     Linear = np.array(errorslist[1])
     Logistic = np.array(errorslist[2])
@@ -101,25 +101,26 @@ def ttestHo(errorslist):
 
 
 if __name__ == '__main__':
-    trainsize = 90000
-    testsize =  10000
-    numruns = 1
+    trainsize = 9000
+    testsize =  1000
+    numruns = 10
 
     classalgs = {
                  'Linear Regression': algs.LinearRegressionClass(),
                  'Logistic Regression': algs.LogitReg(),
                  'Neural Network': algs.NeuralNet({'epochs': 100}),
-
                 }
-    numalgs = len(classalgs)
 
+    numalgs = len(classalgs)
     parameters = (
-        #{'regwgt': 0.01, 'nh': 4},
-       # {'regwgt': 0.0, 'nh': 4},
-         {'regwgt': 0.01, 'nh': 8},
-      #  {'regwgt': 0.05, 'nh': 16},
-      #  {'regwgt': 0.1, 'nh': 32},
-                      )
+        # best parameters for now
+        {'regwgt': 0.1, 'nh': 4,'eta':0.0001},
+       # {'regwgt': 0.01, 'nh': 2,'eta':0.001},
+       # {'regwgt': 0.0, 'nh': 4,'eta':0.0001},
+       # {'regwgt': 0.01, 'nh': 8, 'eta':0.00001},
+       # {'regwgt': 0.05, 'nh': 16,'eta':0.000001},
+       # {'regwgt': 0.1, 'nh': 32},
+                )
     numparams = len(parameters)
 
     errors = {}
@@ -127,14 +128,14 @@ if __name__ == '__main__':
         errors[learnername] = np.zeros((numparams,numruns))
 
     for r in range(numruns):
-        #trainset, testset = dtl.load_skin(trainsize,testsize,r)
+        trainset, testset = dtl.load_skin(trainsize,testsize,r)
 
 
-        #print(('Running on train={0} and test={1} samples for run {2}').format(trainset[0].shape[0], testset[0].shape[0],r))
+        print(('Running on train={0} and test={1} samples for run {2}').format(trainset[0].shape[0], testset[0].shape[0],r))
 
         for p in range(numparams):
-            trainset, testset = dtl.load_skin(trainsize,testsize,r)
-            print(('Running on train={0} and test={1} samples for run {2}').format(trainset[0].shape[0], testset[0].shape[0],r))
+            #trainset, testset = dtl.load_skin(trainsize,testsize,p)
+            #print(('Running on train={0} and test={1} samples for run {2}').format(trainset[0].shape[0], testset[0].shape[0],r))
 
             params = parameters[p]
             for learnername, learner in classalgs.items():
@@ -188,6 +189,6 @@ if __name__ == '__main__':
             for item in errors[i][error]:
                 errorList.append(item)
         errorsList.append(errorList)
+    print errors
     print (errorsList)
-
-    ttestHo(errorsList)
+    t_test(errorsList)

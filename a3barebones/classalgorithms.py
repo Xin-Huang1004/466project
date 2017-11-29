@@ -47,7 +47,7 @@ class LinearRegressionClass(Classifier):
     Simply solves (X.T X/t + lambda eye)^{-1} X.T y/t
     """
     def __init__( self, parameters={} ):
-        self.params = {'regwgt': 0.01}
+        self.params = {'regwgt': 0.1}
         self.reset(parameters)
 
     def reset(self, parameters):
@@ -80,7 +80,7 @@ class LogitReg(Classifier):
 
     def __init__(self, parameters={}):
         # Default: no regularization
-        self.params = {'regwgt': 0.0, 'regularizer': 'None'}
+        self.params = {'regwgt': 0.0, 'regularizer': 'None','eta':0.0001}
         self.reset(parameters)
 
     def reset(self, parameters):
@@ -151,7 +151,7 @@ class LogitReg(Classifier):
             #update err, g
             err = self.logit_cost(gradient, Xtrain, ytrain)
             # update eta by line search
-            eta = 0.00001
+            eta = self.params['eta']
             # update seights
             gradient = np.subtract(gradient,np.dot(eta,self.logit_cost_grad(gradient,Xtrain,ytrain)))
 

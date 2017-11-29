@@ -30,6 +30,15 @@ numpy.random.shuffle(index_list)
 output = []
 for item in range(len(result)):
      output.append(result[index_list[item]])
-              
+# save output data     
 numpy.savetxt("result_1.txt",output,fmt='%d',newline='\n')
+
+
+# this is for normalize data for QQ plot
+normal = output
+
+for ii in range(len(normal)):
+	for item in range(len(normal[ii])-1):
+		normal[ii][item] = normal[ii][item] / 255
+numpy.savetxt("normalize_1.txt",normal,fmt='%f',newline='\n')
 

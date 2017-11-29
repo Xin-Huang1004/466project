@@ -1,1 +1,0 @@
-Skin_NonSkin.txt https://archive.ics.uci.edu/ml/datasets/Skin+Segmentation#

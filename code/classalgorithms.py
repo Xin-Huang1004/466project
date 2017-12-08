@@ -41,41 +41,6 @@ class Classifier:
         ytest = utils.threshold_probs(probs)
         return ytest
 
-class LinearRegressionClass(Classifier):
-    """
-    Linear Regression with ridge regularization
-    Simply solves (X.T X/t + lambda eye)^{-1} X.T y/t
-    """
-    def __init__( self, parameters={} ):
-        self.params = {'regwgt': 0.1}
-        self.reset(parameters)
-
-    def reset(self, parameters):
-        self.resetparams(parameters)
-        self.weights = None
-
-    def learn(self, Xtrain, ytrain):
-        """ Learns using the traindata """
-        # Ensure ytrain is {-1,1}
-        yt = np.copy(ytrain)
-        yt[yt == 0] = -1
-
-        # Dividing by numsamples before adding ridge regularization
-        # for additional stability; this also makes the
-        # regularization parameter not dependent on numsamples
-        # if want regularization disappear with more samples, must pass
-        # such a regularization parameter lambda/t
-        numsamples = Xtrain.shape[0]
-        self.weights = np.dot(np.dot(np.linalg.pinv(np.add(np.dot(Xtrain.T,Xtrain)/numsamples,self.params['regwgt']*np.identity(Xtrain.shape[1]))), Xtrain.T),yt)/numsamples
-
-    def predict(self, Xtest):
-        ytest = np.dot(Xtest, self.weights)
-        ytest[ytest > 0] = 1
-        ytest[ytest < 0] = 0
-        #print self.weights
-        return ytest
-
-
 class LogitReg(Classifier):
 
     def __init__(self, parameters={}):
@@ -205,7 +170,7 @@ class NeuralNet(Classifier):
     the default params will affect the points you get.
     """
     def __init__(self, parameters={}):
-        self.params = {'nh': 4,
+        self.params = {'nh': 12,
                     'transfer': 'sigmoid',
                     'stepsize': 0.01,
                     'epochs': 100}
@@ -321,3 +286,123 @@ class NeuralNet(Classifier):
             else:
                 ytest[i] = 1
         return ytest
+
+
+class NaiveBayes(Classifier):
+    """ Gaussian naive Bayes;  """
+
+    def __init__(self, parameters={}):
+        """ Params can contain any useful parameters for the algorithm """
+        # Assumes that a bias unit has been added to feature vector as the last feature
+        # If usecolumnones is False, it should ignore this last feature
+        self.params = {'usecolumnones': True}
+        self.reset(parameters)
+
+    def reset(self, parameters):
+        self.resetparams(parameters)
+        self.means = []
+        self.stds = []
+        self.numfeatures = 0
+        self.numclasses = 0
+
+    def learn(self, Xtrain, ytrain):
+        """
+        In the first code block, you should set self.numclasses and
+        self.numfeatures correctly based on the inputs and the given parameters
+        (use the column of ones or not).
+
+        In the second code block, you should compute the parameters for each
+        feature. In this case, they're mean and std for Gaussian distribution.
+        """
+
+        ### YOUR CODE HERE
+
+        # check the number of classes
+        num_of_classes = []
+        for i in ytrain:
+            if i not in num_of_classes:
+                num_of_classes.append(i)
+
+        # set numclasses and numfeatures
+        self.numclasses = len(num_of_classes)
+        self.numfeatures = (Xtrain.shape[1]) - 1
+        if (self.params['usecolumnones'] == True):
+            self.numfeatures += 1
+
+        ### END YOUR CODE
+
+        origin_shape = (self.numclasses, self.numfeatures)
+        self.means = np.zeros(origin_shape)
+        self.stds = np.zeros(origin_shape)
+
+        ### YOUR CODE HERE
+
+        # split data by class(y value is 0 or 1)
+        class_0 = []
+        class_1 = []
+        for i in range(len(ytrain)):
+            if ytrain[i] == 0:
+                class_0.append(Xtrain[i])
+            if ytrain[i] == 1:
+                class_1.append(Xtrain[i])
+
+        # mean and std for class_0
+        for i in range(self.numfeatures):
+            feature = []
+            for j in range(len(class_0)):
+                feature.append(class_0[j][i])
+            self.means[0][i] = (utils.mean(feature))
+            self.stds[0][i] = (utils.stdev(feature))
+
+        # mean and std for class_1
+        for i in range(self.numfeatures):
+            feature = []
+            for j in range(len(class_1)):
+                feature.append(class_1[j][i])
+            self.means[1][i] = (utils.mean(feature))
+            self.stds[1][i] = (utils.stdev(feature))
+        
+        ### END YOUR CODE
+        assert self.means.shape == origin_shape
+        assert self.stds.shape == origin_shape
+
+    def predict(self, Xtest):
+        """
+        Use the parameters computed in self.learn to give predictions on new
+        observations.
+        """
+        ytest = np.zeros(Xtest.shape[0], dtype=int)
+    
+        ### YOUR CODE HERE
+
+        # for each unit x in Xtest, calculate the probability that x is belong to class 0 or class 1
+        # take the bigger one
+        for i in range(len(Xtest)):
+            probility_0 = 1
+            probility_1 = 1
+            # calculate probability for class 0
+            for j in range(self.numfeatures):
+                temp = ((Xtest[i][j] - self.means[0][j]) * (Xtest[i][j] - self.means[0][j])) / (2 * self.stds[0][j] * self.stds[0][j])
+                e = np.exp(-temp)
+                probility_0 *= (1 / (np.sqrt(2 * np.pi * (self.stds[0][j] * self.stds[0][j])))) * e
+
+            # calculate probability for class 1
+            # for the "ZeroDivisionError: float division by zero"
+            # math give the error and terminate the program, np just show a warning but does not terminate the program
+            for j in range(self.numfeatures):
+                temp = (math.pow((Xtest[i][j] - self.means[1][j]),2)) / (2*math.pow(self.stds[1][j],2))
+                e = math.exp(-temp)
+                probility_1 *= (1 / (math.sqrt(2 * math.pi * math.pow(self.stds[1][j], 2)))) * e
+
+            # if class 0 has bigger probility set y to 0
+            # else set y to 1
+            if probility_0 > probility_1:
+                ytest[i] = 0
+            else:
+                ytest[i] = 1
+
+        ### END YOUR CODE
+
+        assert len(ytest) == Xtest.shape[0]
+        return ytest
+

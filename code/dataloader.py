@@ -6,7 +6,8 @@ import random
 ####### Main load functions
 def load_skin(trainsize=500, testsize=1000,numruns = 1):
     """ A physics classification dataset """
-    filename = 'datasets/result_1.txt'
+    #filename = 'datasets/validation.txt'
+    filename = 'datasets/train_test.txt'
     dataset = np.loadtxt(filename)
     trainset, testset = splitdataset(numruns,dataset,trainsize, testsize)
     return trainset,testset

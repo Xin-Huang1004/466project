@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt
 
 from scipy import stats
 
+import matplotlib as mpl
+
 
 def getaccuracy(ytest, predictions):
     correct = 0
@@ -20,10 +22,6 @@ def getaccuracy(ytest, predictions):
         if ytest[i] == predictions[i]:
             correct += 1
     return (correct/float(len(ytest))) * 100.0
-
-def geterror(ytest, predictions):
-    return (100.0-getaccuracy(ytest, predictions))
-
 
 def fun(x1,x2,w1,w2,w3,w0):
     '''
@@ -73,29 +71,29 @@ def plotgbr(temp,w,is_NN,learnername):
     plt.show()
 
 def t_test(errorslist):
-    Neural_Network = np.array(errorslist[0])
-    Linear = np.array(errorslist[1])
+    NaiveBayes = np.array(errorslist[0])
+    Neural_Network = np.array(errorslist[1])
     Logistic = np.array(errorslist[2])
     # test NN is better than linear?
     alpha = 0.01
-    t,p = stats.ttest_ind(Neural_Network,Linear,equal_var=False)
+    t,p = stats.ttest_ind(Neural_Network,NaiveBayes,equal_var=False)
     print('t-value is: %f,  p-vaule is: %f'%(t,p))
     if p < alpha:
-        print("Reject h0,NN is better")
+        print("Reject h0, Neural Network and NaiveBayes are different!")
     else:
         print("Fail to reject h0")
     # test NN is better than logsitic?
     t,p = stats.ttest_ind(Neural_Network,Logistic,equal_var=False)
     print('t-value is: %f,  p-vaule is: %f'%(t,p))
     if p < alpha:
-        print("Reject h0,NN is better")
+        print("Reject h0,Neural_Network and Logistic are different!")
     else:
         print("Fail to reject h0")
     # test liner is better than logistic?
-    t,p = stats.ttest_ind(Linear,Logistic,equal_var=False)
+    t,p = stats.ttest_ind(NaiveBayes,Logistic,equal_var=False)
     print('t-value is: %f,  p-vaule is: %f'%(t,p))
     if p < alpha:
-        print("Reject h0,Linear is better")
+        print("Reject h0,NaiveBayes and Logistic are different!")
     else:
         print("Fail to reject h0")
 
@@ -106,20 +104,27 @@ if __name__ == '__main__':
     numruns = 10
 
     classalgs = {
-                 'Linear Regression': algs.LinearRegressionClass(),
+                 #'Linear Regression': algs.LinearRegressionClass(),
+                 'Naive Bayes': algs.NaiveBayes({'usecolumnones': False}),
                  'Logistic Regression': algs.LogitReg(),
                  'Neural Network': algs.NeuralNet({'epochs': 100}),
+                 #'KernelLogitReg': algs.KernelLogitReg({'kernel': 'linear'})
+                 
                 }
 
     numalgs = len(classalgs)
     parameters = (
         # best parameters for now
-        {'regwgt': 0.1, 'nh': 4,'eta':0.0001},
-       # {'regwgt': 0.01, 'nh': 2,'eta':0.001},
-       # {'regwgt': 0.0, 'nh': 4,'eta':0.0001},
-       # {'regwgt': 0.01, 'nh': 8, 'eta':0.00001},
-       # {'regwgt': 0.05, 'nh': 16,'eta':0.000001},
-       # {'regwgt': 0.1, 'nh': 32},
+        {'regwgt': 0.1, 'nh': 12,'eta':0.0001},
+       # {'regwgt': 0.1, 'nh': 2,'eta':0.01},
+       # {'regwgt': 0.01, 'nh': 4,'eta':0.001},
+       # {'regwgt': 0.02, 'nh': 6,'eta':0.0001},
+       # {'regwgt': 0.03, 'nh': 8,'eta':0.0005},
+       # {'regwgt': 0.04, 'nh': 10,'eta':0.00001},
+       # {'regwgt': 0.05, 'nh': 12,'eta':0.00005},
+       # {'regwgt': 0.06, 'nh': 14,'eta':0.000001},
+       # {'regwgt': 0.1,  'nh': 16,'eta':0.000005},
+       #{'regwgt': 0.0,  'nh': 32,'eta':0.0000001},
                 )
     numparams = len(parameters)
 
@@ -146,14 +151,14 @@ if __name__ == '__main__':
                 learner.learn(trainset[0], trainset[1])
                 # Test model
                 predictions = learner.predict(testset[0])
-                error = geterror(testset[1], predictions)
-                print ('Error for ' + learnername + ': ' + str(error))
+                error = getaccuracy(testset[1], predictions)
+                print ('Accuracy for ' + learnername + ': ' + str(error))
                 errors[learnername][p,r] = error
 
 
-    w=[]
-    w1 = []
-    is_NN = 0
+    #w=[]
+    #w1 = []
+    #is_NN = 0
     for learnername, learner in classalgs.items():
         besterror = np.mean(errors[learnername][0,:])
         bestparams = 0
@@ -178,8 +183,8 @@ if __name__ == '__main__':
         print ('Best parameters for ' + learnername + ': ' + str(learner.getparams()))
 
         print ('Average error for ' + learnername + ': ' + str(besterror) + ' +- ' + str(np.std(errors[learnername][bestparams,:])/math.sqrt(numruns)))
-        #sample_std = np.std(errors[learnername],ddof=1) / np.sqrt(numparams)
-        #print("Standard error for " +learnername + ": " + str(sample_std))
+        sample_std = np.std(errors[learnername],ddof=1) / np.sqrt(numparams)
+        print("Standard error for " +learnername + ": " + str(sample_std))
 
     errorsList = []
     for i,j in classalgs.items():
@@ -189,6 +194,6 @@ if __name__ == '__main__':
             for item in errors[i][error]:
                 errorList.append(item)
         errorsList.append(errorList)
-    print errors
+    print (errors)
     print (errorsList)
     t_test(errorsList)
